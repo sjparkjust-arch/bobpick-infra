@@ -39,17 +39,17 @@ resource "aws_security_group" "app" {
   ingress {
     description     = "App port from ALB"
     from_port       = 8000
-    to_port          = 8000
-    protocol         = "tcp"
-    security_groups  = [aws_security_group.alb.id]
+    to_port         = 8000
+    protocol        = "tcp"
+    security_groups = [aws_security_group.alb.id]
   }
 
   ingress {
     description     = "SSH from Bastion"
     from_port       = 22
-    to_port          = 22
-    protocol         = "tcp"
-    security_groups  = [aws_security_group.bastion.id]
+    to_port         = 22
+    protocol        = "tcp"
+    security_groups = [aws_security_group.bastion.id]
   }
 
   egress {
@@ -73,7 +73,7 @@ resource "aws_security_group" "bastion" {
     from_port   = 22
     to_port     = 22
     protocol    = "tcp"
-    cidr_blocks = var.allowed_ssh_ips  # 아래 확인 방법 참고해서 실제 IP로 교체
+    cidr_blocks = var.allowed_ssh_ips # 아래 확인 방법 참고해서 실제 IP로 교체
   }
 
   egress {
@@ -95,17 +95,17 @@ resource "aws_security_group" "db" {
   ingress {
     description     = "MySQL from App"
     from_port       = 3306
-    to_port          = 3306
-    protocol         = "tcp"
-    security_groups  = [aws_security_group.app.id, aws_security_group.bastion.id]
+    to_port         = 3306
+    protocol        = "tcp"
+    security_groups = [aws_security_group.app.id, aws_security_group.bastion.id]
   }
 
   ingress {
     description     = "Redis from App"
     from_port       = 6379
-    to_port          = 6379
-    protocol         = "tcp"
-    security_groups  = [aws_security_group.app.id, aws_security_group.bastion.id]
+    to_port         = 6379
+    protocol        = "tcp"
+    security_groups = [aws_security_group.app.id, aws_security_group.bastion.id]
   }
 
   egress {
