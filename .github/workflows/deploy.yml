@@ -4,7 +4,6 @@ on:
   push:
     branches:
       - main
-    # 💡 꿀팁: infra 폴더가 변경될 때는 이 파이프라인을 무시(ignore)하라는 설정
     paths-ignore:
       - 'infra/**'
       - '.github/workflows/terraform.yml'
@@ -17,19 +16,56 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v3
 
-      - name: Deploy to EC2 instances via Bastion
-        uses: appleboy/ssh-action@v1.0.0
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v4
         with:
-          host: 10.0.10.151 # (추후 자동화 스크립트로 변경할 부분)
-          username: ${{ secrets.EC2_USER }}
-          key: ${{ secrets.BASTION_KEY }}
-          proxy_host: ${{ secrets.BASTION_HOST }}
-          proxy_username: ${{ secrets.EC2_USER }}
-          proxy_key: ${{ secrets.BASTION_KEY }}
-          script: |
-            cd /home/ubuntu/bobpick
-            git pull origin main
-            source venv/bin/activate
-            pip install -r requirements.txt
-            python manage.py migrate
-            sudo systemctl restart gunicorn
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ap-northeast-2
+
+      - name: Get GitHub Runner IP
+        id: ip
+        run: echo "ipv4=$(curl -s https://checkip.amazonaws.com)" >> $GITHUB_OUTPUT
+
+      - name: Add GitHub IP to Bastion Security Group
+        run: |
+          aws ec2 authorize-security-group-ingress \
+            --group-id ${{ secrets.BASTION_SG_ID }} \
+            --protocol tcp \
+            --port 22 \
+            --cidr ${{ steps.ip.outputs.ipv4 }}/32
+
+      # ASG에 지금 살아있는 인스턴스 전부(사설 IP 리스트)를 가져옴
+      - name: Get all running instance IPs from ASG
+        id: instance_ips
+        run: |
+          INSTANCE_IDS=$(aws autoscaling describe-auto-scaling-groups \
+            --auto-scaling-group-names bobpick-app-asg \
+            --query 'AutoScalingGroups[0].Instances[?LifecycleState==`InService`].InstanceId' \
+            --output text)
+          IPS=$(aws ec2 describe-instances --instance-ids $INSTANCE_IDS \
+            --query 'Reservations[*].Instances[*].PrivateIpAddress' --output text)
+          echo "ips=$IPS" >> $GITHUB_OUTPUT
+
+      # SSH agent는 한 번만 띄우고, IP 개수만큼 반복해서 순차 배포
+      - name: Deploy to all instances via Bastion
+        run: |
+          eval $(ssh-agent -s)
+          echo "${{ secrets.BASTION_KEY }}" | tr -d '\r' | ssh-add -
+
+          for ip in ${{ steps.instance_ips.outputs.ips }}; do
+            echo "===== Deploying to $ip ====="
+            ssh -o StrictHostKeyChecking=no \
+                -o ProxyCommand="ssh -o StrictHostKeyChecking=no -W %h:%p ${{ secrets.EC2_USER }}@${{ secrets.BASTION_HOST }}" \
+                ${{ secrets.EC2_USER }}@$ip \
+                "cd /home/ubuntu/bobpick && git pull origin main && source venv/bin/activate && pip install -r requirements.txt && python manage.py migrate && sudo systemctl restart gunicorn"
+          done
+
+      - name: Remove GitHub IP from Bastion Security Group
+        if: always()
+        run: |
+          aws ec2 revoke-security-group-ingress \
+            --group-id ${{ secrets.BASTION_SG_ID }} \
+            --protocol tcp \
+            --port 22 \
+            --cidr ${{ steps.ip.outputs.ipv4 }}/32
