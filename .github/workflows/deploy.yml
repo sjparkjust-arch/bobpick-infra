@@ -62,7 +62,7 @@ jobs:
             ssh -o StrictHostKeyChecking=no \
                 -o ProxyCommand="ssh -o StrictHostKeyChecking=no -W %h:%p ${{ secrets.EC2_USER }}@${{ secrets.BASTION_HOST }}" \
                 ${{ secrets.EC2_USER }}@$ip \
-                "cd /home/ubuntu/bobpick && git pull origin main && source venv/bin/activate && pip install -r requirements.txt && python manage.py migrate && sudo systemctl restart gunicorn"
+                "cd /home/ubuntu/menu-recommend && git pull origin main && source venv/bin/activate && pip install -r requirements.txt && python manage.py migrate && sudo systemctl restart gunicorn"
           done
 
       - name: Remove GitHub IP from Bastion Security Group
