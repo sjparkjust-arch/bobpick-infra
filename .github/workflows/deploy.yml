@@ -1,0 +1,35 @@
+name: Deploy to Private ASG
+
+on:
+  push:
+    branches:
+      - main
+    # 💡 꿀팁: infra 폴더가 변경될 때는 이 파이프라인을 무시(ignore)하라는 설정
+    paths-ignore:
+      - 'infra/**'
+      - '.github/workflows/terraform.yml'
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Deploy to EC2 instances via Bastion
+        uses: appleboy/ssh-action@v1.0.0
+        with:
+          host: 10.0.10.151 # (추후 자동화 스크립트로 변경할 부분)
+          username: ${{ secrets.EC2_USER }}
+          key: ${{ secrets.BASTION_KEY }}
+          proxy_host: ${{ secrets.BASTION_HOST }}
+          proxy_username: ${{ secrets.EC2_USER }}
+          proxy_key: ${{ secrets.BASTION_KEY }}
+          script: |
+            cd /home/ubuntu/bobpick
+            git pull origin main
+            source venv/bin/activate
+            pip install -r requirements.txt
+            python manage.py migrate
+            sudo systemctl restart gunicorn
