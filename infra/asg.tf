@@ -1,7 +1,7 @@
 # 1. 시작 템플릿 (Launch Template)
 resource "aws_launch_template" "app_lt" {
   name_prefix   = "bobpick-app-lt-"
-  image_id      = "ami-0f1deaf3420127bc1"
+  image_id      = "ami-0871d249bf705c567"
   instance_type = "t3.micro"
   key_name      = "mysite-key"
 
