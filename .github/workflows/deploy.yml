@@ -46,7 +46,7 @@ jobs:
           IPS=$(aws ec2 describe-instances --instance-ids $INSTANCE_IDS \
             --query 'Reservations[*].Instances[*].PrivateIpAddress' --output text)
 
-          FORMATTED_IPS=$(echo $IPS)
+          FORMATTED_IPS=$(echo $RAW_IPS | tr ' ' '\n' | grep -v "${{ secrets.BASTION_HOST }}" | grep -v "10.0.2.120" | tr '\n' ' ')
           
           echo "Found IPs: $FORMATTED_IPS"
           echo "ips=$FORMATTED_IPS" >> $GITHUB_OUTPUT
