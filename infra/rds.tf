@@ -24,7 +24,7 @@ resource "aws_db_instance" "mysql" {
   vpc_security_group_ids = [aws_security_group.db.id]
   skip_final_snapshot    = true
   publicly_accessible    = false
-  multi_az               = false
+  multi_az               = true
 
   tags = {
     Name = "${var.environment}-mysql-db"
