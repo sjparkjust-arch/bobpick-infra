@@ -9,20 +9,6 @@ data "aws_ami" "ubuntu" {
   }
 }
 
-# 2. 징검다리 및 검증용 EC2 인스턴스 생성
-resource "aws_instance" "app_server" {
-  ami           = data.aws_ami.ubuntu.id
-  instance_type = "t3.micro"
-
-  subnet_id              = aws_subnet.private_app_a.id
-  vpc_security_group_ids = [aws_security_group.app.id]
-
-  key_name = "mysite-key"
-
-  tags = {
-    Name = "${var.environment}-base-ec2"
-  }
-}
 
 # 3. 퍼블릭 서브넷에 위치할 베스천 호스트 EC2 생성
 resource "aws_instance" "bastion" {
