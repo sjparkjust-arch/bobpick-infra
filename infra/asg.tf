@@ -1,9 +1,13 @@
 # 1. 시작 템플릿 (Launch Template)
 resource "aws_launch_template" "app_lt" {
   name_prefix   = "bobpick-app-lt-"
-  image_id      = "ami-0871d249bf705c567"
+  image_id      = "ami-078f32a3cf45126fd"
   instance_type = "t3.micro"
   key_name      = "mysite-key"
+
+  iam_instance_profile {
+    name = aws_iam_instance_profile.app_ec2_profile.name
+  }
 
   vpc_security_group_ids = [aws_security_group.app.id]
 
