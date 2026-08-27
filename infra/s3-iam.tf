@@ -22,6 +22,12 @@ resource "aws_iam_role_policy_attachment" "s3_access" {
   policy_arn = "arn:aws:iam::aws:policy/AmazonS3FullAccess"
 }
 
+# SSM 접근 권한 부여
+resource "aws_iam_role_policy_attachment" "ssm_access" {
+  role       = aws_iam_role.app_ec2_role.name
+  policy_arn = "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore"
+}
+
 # 3. EC2 시작 템플릿에 연결해줄 '인스턴스 프로파일'
 resource "aws_iam_instance_profile" "app_ec2_profile" {
   name = "bobpick-app-ec2-profile"
