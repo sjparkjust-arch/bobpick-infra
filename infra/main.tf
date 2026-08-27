@@ -10,7 +10,7 @@ terraform {
     bucket         = "bobpick-terraform-state"
     key            = "bobpick/terraform.tfstate"
     region         = "ap-northeast-2"
-    dynamodb_table = "bobpick-terraform-lock"
+    use_lockfile = true
     encrypt        = true
   }
 }
