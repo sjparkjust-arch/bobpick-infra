@@ -28,7 +28,7 @@ resource "aws_autoscaling_group" "app_asg" {
   name_prefix      = "bobpick-app-asg-"
   desired_capacity = 2
   max_size         = 4
-  min_size         = 2
+  min_size         = 3
 
   vpc_zone_identifier = [aws_subnet.private_app_a.id, aws_subnet.private_app_c.id]
 
