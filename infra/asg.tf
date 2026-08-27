@@ -11,6 +11,18 @@ resource "aws_launch_template" "app_lt" {
 
   vpc_security_group_ids = [aws_security_group.app.id]
 
+  user_data = base64encode(<<-EOF
+    #!/bin/bash
+    cd /home/ubuntu/menu-recommend
+    sudo -u ubuntu git pull origin main
+    sudo -u ubuntu venv/bin/pip install -r requirements.txt
+    sudo -u ubuntu venv/bin/python manage.py migrate
+    sudo -u ubuntu venv/bin/python manage.py collectstatic --noinput
+    sudo systemctl restart gunicorn
+  EOF
+  )
+
+
   tag_specifications {
     resource_type = "instance"
     tags = {
