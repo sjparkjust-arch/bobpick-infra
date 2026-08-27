@@ -7,11 +7,11 @@ terraform {
   }
 
   backend "s3" {
-    bucket       = "bobpick-terraform-state"
-    key          = "bobpick/terraform.tfstate"
-    region       = "ap-northeast-2"
-    use_lockfile = true
-    encrypt      = true
+    bucket         = "bobpick-terraform-state"
+    key            = "bobpick/terraform.tfstate"
+    region         = "ap-northeast-2"
+    dynamodb_table = "bobpick-terraform-lock"
+    encrypt        = true
   }
 }
 
