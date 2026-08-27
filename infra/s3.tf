@@ -69,10 +69,11 @@ resource "aws_cloudfront_distribution" "cdn" {
         forward = "none"
       }
     }
-    viewer_protocol_policy = "redirect-to-https"
-    min_ttl                = 0
-    default_ttl            = 86400    # 1일 캐싱
-    max_ttl                = 31536000 # 365일 캐싱
+    viewer_protocol_policy     = "redirect-to-https"
+    min_ttl                    = 0
+    default_ttl                = 86400    # 1일 캐싱
+    max_ttl                    = 31536000 # 365일 캐싱
+    response_headers_policy_id = "eaab4381-ed33-4a86-88ca-d9558dc6cd63"
   }
 
   restrictions {
