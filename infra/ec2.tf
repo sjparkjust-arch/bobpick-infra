@@ -21,6 +21,8 @@ resource "aws_instance" "bastion" {
   key_name                    = "mysite-key"
   associate_public_ip_address = true
 
+  iam_instance_profile = aws_iam_instance_profile.ssm_profile.name
+
   tags = {
     Name = "bobpick-public-bastion"
   }
