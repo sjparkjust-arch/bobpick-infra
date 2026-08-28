@@ -12,7 +12,7 @@ provider "aws" {
 }
 
 resource "aws_s3_bucket" "tfstate" {
-  bucket = "bobpick-terraform-state"
+  bucket = "bobpick-terraform-state-move0828"
 }
 
 resource "aws_s3_bucket_versioning" "tfstate" {

@@ -17,7 +17,7 @@ variable "environment" {
 variable "app_storage_bucket_name" {
   description = "Django 정적/미디어 파일 저장용 S3 버킷 이름"
   type        = string
-  default     = "bobpick-main-s3"
+  default     = "bobpick-main-s3-move0828"
 }
 
 # 3. RDS 설정값

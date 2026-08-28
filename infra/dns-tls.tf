@@ -1,4 +1,4 @@
-data "aws_route53_zone" "main" {
+resource "aws_route53_zone" "main" {
   name = "bobpick.cloud"
 }
 
@@ -29,7 +29,7 @@ resource "aws_route53_record" "cert_validation" {
   records         = [each.value.record]
   ttl             = 60
   type            = each.value.type
-  zone_id         = data.aws_route53_zone.main.zone_id
+  zone_id         = aws_route53_zone.main.zone_id
 }
 
 resource "aws_acm_certificate_validation" "main" {
@@ -72,7 +72,7 @@ resource "aws_lb_listener_rule" "redirect_http_to_https" {
 }
 
 resource "aws_route53_record" "app" {
-  zone_id = data.aws_route53_zone.main.zone_id
+  zone_id = aws_route53_zone.main.zone_id
   name    = "bobpick.cloud"
   type    = "A"
 
@@ -81,4 +81,8 @@ resource "aws_route53_record" "app" {
     zone_id                = aws_lb.main.zone_id
     evaluate_target_health = true
   }
+}
+
+output "route53_name_servers" {
+  value = aws_route53_zone.main.name_servers
 }
