@@ -7,6 +7,7 @@ resource "aws_wafv2_web_acl" "main" {
     allow {}
   }
 
+
   # 1. AWS 관리형 규칙 - 일반적인 웹 공격(SQL Injection, XSS 등) 차단
   rule {
     name     = "AWS-AWSManagedRulesCommonRuleSet"

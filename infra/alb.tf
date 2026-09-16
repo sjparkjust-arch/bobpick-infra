@@ -16,6 +16,7 @@ resource "aws_lb_target_group" "app" {
   protocol    = "HTTP"
   vpc_id      = aws_vpc.main.id
   target_type = "instance"
+  slow_start  = 60
 
   health_check {
     path                = "/"

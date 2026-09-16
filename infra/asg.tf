@@ -1,7 +1,7 @@
 # 1. 시작 템플릿 (Launch Template)
 resource "aws_launch_template" "app_lt" {
   name_prefix   = "bobpick-app-lt-"
-  image_id      = "ami-0bac0d3c217978bad"
+  image_id      = "ami-0ab39230817f32278"
   instance_type = "t3.micro"
   key_name      = "bobpick-key-0914"
 
@@ -11,17 +11,18 @@ resource "aws_launch_template" "app_lt" {
 
   vpc_security_group_ids = [aws_security_group.app.id]
 
+  monitoring {
+    enabled = true
+  }
+
   user_data = base64encode(<<-EOF
     #!/bin/bash
     cd /home/ubuntu/menu-recommend
     sudo -u ubuntu git pull origin main
     sudo -u ubuntu venv/bin/pip install -r requirements.txt
-    sudo -u ubuntu venv/bin/python manage.py migrate
-    sudo -u ubuntu venv/bin/python manage.py collectstatic --noinput
-    sudo systemctl restart gunicorn
+    sudo systemctl reload gunicorn || sudo systemctl restart gunicorn
   EOF
   )
-
 
   tag_specifications {
     resource_type = "instance"
@@ -62,5 +63,21 @@ resource "aws_autoscaling_group" "app_asg" {
 
   lifecycle {
     create_before_destroy = true
+  }
+}
+
+# 3. Target Tracking 오토스케일링 정책
+resource "aws_autoscaling_policy" "cpu_target" {
+  name                   = "bobpick-cpu-target-tracking"
+  autoscaling_group_name = aws_autoscaling_group.app_asg.name
+  policy_type            = "TargetTrackingScaling"
+
+  estimated_instance_warmup = 180
+
+  target_tracking_configuration {
+    predefined_metric_specification {
+      predefined_metric_type = "ASGAverageCPUUtilization"
+    }
+    target_value = 40.0
   }
 }
