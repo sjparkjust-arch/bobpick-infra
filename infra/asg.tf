@@ -3,7 +3,7 @@ resource "aws_launch_template" "app_lt" {
   name_prefix   = "bobpick-app-lt-"
   image_id      = "ami-0ab39230817f32278"
   instance_type = "t3.micro"
-  key_name      = "bobpick-key-0914"
+  key_name      = "3rd-project"
 
   iam_instance_profile {
     name = aws_iam_instance_profile.app_ec2_profile.name
@@ -78,6 +78,6 @@ resource "aws_autoscaling_policy" "cpu_target" {
     predefined_metric_specification {
       predefined_metric_type = "ASGAverageCPUUtilization"
     }
-    target_value = 40.0
+    target_value = 70.0
   }
 }

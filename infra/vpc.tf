@@ -17,7 +17,9 @@ resource "aws_subnet" "public_a" {
   map_public_ip_on_launch = true
 
   tags = {
-    Name = "bobpick-public-a"
+    Name                                      = "bobpick-public-a"
+    "kubernetes.io/role/elb"                  = "1"
+    "kubernetes.io/cluster/bobpick-cluster"   = "shared"
   }
 }
 
@@ -28,7 +30,9 @@ resource "aws_subnet" "public_c" {
   map_public_ip_on_launch = true
 
   tags = {
-    Name = "bobpick-public-c"
+    Name                                      = "bobpick-public-c"
+    "kubernetes.io/role/elb"                  = "1"
+    "kubernetes.io/cluster/bobpick-cluster"   = "shared"
   }
 }
 
@@ -39,7 +43,9 @@ resource "aws_subnet" "private_app_a" {
   availability_zone = "ap-northeast-2a"
 
   tags = {
-    Name = "bobpick-private-app-a"
+    Name                                      = "bobpick-private-app-a"
+    "kubernetes.io/role/internal-elb"         = "1"
+    "kubernetes.io/cluster/bobpick-cluster"   = "shared"
   }
 }
 
@@ -49,7 +55,9 @@ resource "aws_subnet" "private_app_c" {
   availability_zone = "ap-northeast-2c"
 
   tags = {
-    Name = "bobpick-private-app-c"
+    Name                                      = "bobpick-private-app-c"
+    "kubernetes.io/role/internal-elb"         = "1"
+    "kubernetes.io/cluster/bobpick-cluster"   = "shared"
   }
 }
 

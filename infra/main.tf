@@ -7,10 +7,10 @@ terraform {
   }
 
   backend "s3" {
-    bucket         = "bobpick-terraform-state-move0914"
+    bucket         = "bobpick-terraform-state-3rd-han"
     key            = "bobpick/terraform.tfstate"
     region         = "ap-northeast-2"
-    dynamodb_table = "bobpick-terraform-lock"
+    dynamodb_table = "bobpick-terraform-lock-3rd"
     encrypt        = true
   }
 }
