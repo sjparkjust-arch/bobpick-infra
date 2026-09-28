@@ -40,23 +40,18 @@ resource "aws_secretsmanager_secret" "app_secret" {
 }
 
 resource "aws_secretsmanager_secret_version" "app_secret_val" {
-  secret_id     = aws_secretsmanager_secret.app_secret.id
+  secret_id = aws_secretsmanager_secret.app_secret.id
   secret_string = jsonencode({
-    ALLOWED_HOSTS        = "*"
-    DB_NAME              = "bobpickdb"
-    DB_USER              = "admin"
-    DB_PASSWORD          = var.db_password
-    
-    # 🌟 생성된 주소에서 포트번호(:3306)를 깔끔하게 잘라내고 자동 주입
-    DB_HOST              = split(":", aws_db_instance.mysql.endpoint)[0] 
-    
-    # 🌟 생성된 Redis 주소를 자동으로 주입
-    REDIS_HOST           = aws_elasticache_cluster.redis.cache_nodes[0].address 
-    
-    SECRET_KEY           = "3n6zq7(=jgmunpm1ozrdfrplk50fqacyz%t4z8q*qurao#pcz)"
-    AWS_QUERYSTRING_AUTH = "False"
-    
-    # 🌟 주의: cloudfront 리소스 이름이 다르다면 s3.tf를 확인하고 맞춰주세요 (예: aws_cloudfront_distribution.cdn.domain_name)
-    AWS_S3_CUSTOM_DOMAIN = aws_cloudfront_distribution.main.domain_name 
+    DEBUG                   = "True"
+    ALLOWED_HOSTS           = "*"
+    DB_NAME                 = var.db_name
+    DB_USER                 = var.db_username
+    DB_PASSWORD             = var.db_password
+    DB_HOST                 = aws_db_instance.mysql.address
+    REDIS_URL               = "redis://${aws_elasticache_cluster.redis.cache_nodes[0].address}:6379/0"
+    SECRET_KEY              = var.django_secret_key
+    AWS_STORAGE_BUCKET_NAME = aws_s3_bucket.app_storage.bucket
+    AWS_S3_CUSTOM_DOMAIN    = aws_cloudfront_distribution.cdn.domain_name # 👈 cdn으로 수정
+    AWS_QUERYSTRING_AUTH    = "False"
   })
 }

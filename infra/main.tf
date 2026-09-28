@@ -7,7 +7,7 @@ terraform {
   }
 
   backend "s3" {
-    bucket         = "bobpick-terraform-state-3rd-han"
+    bucket         = "bobpick-terraform-state-3rd-team"
     key            = "bobpick/terraform.tfstate"
     region         = "ap-northeast-2"
     dynamodb_table = "bobpick-terraform-lock-3rd"

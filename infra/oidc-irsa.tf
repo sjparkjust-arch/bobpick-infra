@@ -1,3 +1,4 @@
+data "aws_caller_identity" "current" {}
 # ==========================================
 # 1. EKS OIDC Provider (지문 인식기 설치)
 # ==========================================
@@ -88,7 +89,7 @@ resource "aws_iam_policy" "eso_policy" {
     Statement = [{
       Effect = "Allow"
       Action = ["secretsmanager:GetSecretValue", "secretsmanager:DescribeSecret"]
-      Resource = ["arn:aws:secretsmanager:ap-northeast-2:370201257485:secret:*"]
+      Resource = ["arn:aws:secretsmanager:ap-northeast-2:${data.aws_caller_identity.current.account_id}:secret:*"]
     }]
   })
 }

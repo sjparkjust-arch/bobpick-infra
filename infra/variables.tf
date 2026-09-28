@@ -39,30 +39,6 @@ variable "db_password" {
   sensitive   = true
 }
 
-# 4. 네트워크 ID는 이제 하드코딩 대신 실제 리소스를 직접 참조합니다 (network.tf, security.tf 참고)
-variable "db_subnet_ids" {
-  description = "Private DB 서브넷 ID 목록 (최소 2개 AZ 필요)"
-  type        = list(string)
-  default     = []
-}
-
-variable "db_security_group_id" {
-  description = "RDS 및 Redis용 보안 그룹 ID"
-  type        = string
-  default     = ""
-}
-
-variable "app_subnet_id" {
-  description = "EC2가 배치될 Private App 서브넷 ID"
-  type        = string
-  default     = ""
-}
-
-variable "ec2_security_group_id" {
-  description = "EC2에 적용될 방화벽(보안그룹) ID"
-  type        = string
-  default     = ""
-}
 
 variable "public_subnet_id" {
   description = "베스천 호스트가 들어갈 퍼블릭 서브넷 ID"
@@ -70,8 +46,9 @@ variable "public_subnet_id" {
   default     = ""
 }
 
-variable "bastion_security_group_id" {
-  description = "베스천 호스트용 보안 그룹 ID"
+
+variable "django_secret_key" {
+  description = "Django 애플리케이션 SECRET_KEY"
   type        = string
-  default     = ""
+  sensitive   = true
 }

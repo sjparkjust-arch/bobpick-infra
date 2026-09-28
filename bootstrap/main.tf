@@ -13,7 +13,7 @@ provider "aws" {
 
 # S3 버킷 이름에 3rd- 적용
 resource "aws_s3_bucket" "tfstate" {
-  bucket = "bobpick-terraform-state-3rd-han" 
+  bucket = "bobpick-terraform-state-3rd-team" 
 }
 
 resource "aws_s3_bucket_versioning" "tfstate" {
