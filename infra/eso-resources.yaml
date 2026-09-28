@@ -11,7 +11,7 @@ spec:
 apiVersion: external-secrets.io/v1
 kind: ExternalSecret
 metadata:
-  name: bobpick-app-secret-es
+  name: bobpick-app-secret
   namespace: bobpick
 spec:
   refreshInterval: 1h
@@ -22,5 +22,5 @@ spec:
     name: bobpick-app-secret
     creationPolicy: Owner
   dataFrom:
-  - extract:
-      key: bobpick/prod/env
+    - extract:
+        key: bobpick/prod/env
