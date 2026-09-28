@@ -54,6 +54,11 @@ resource "aws_iam_role_policy_attachment" "eks_container_registry_readonly" {
   role       = aws_iam_role.eks_node_role.name
 }
 
+resource "aws_iam_role_policy_attachment" "eks_node_secrets_manager" {
+  policy_arn = "arn:aws:iam::aws:policy/SecretsManagerReadWrite"
+  role       = aws_iam_role.eks_node_role.name
+}
+
 # ==========================================
 # 3. EKS Control Plane (클러스터 본체)
 # ==========================================
@@ -77,25 +82,53 @@ resource "aws_eks_cluster" "main" {
 }
 
 # ==========================================
-# 4. EKS Managed Node Group (워커 노드 그룹)
+# 4. EKS Managed Node Group (시작 템플릿 적용)
 # ==========================================
+
+# 4-1. EKS 1.31 버전에 맞는 최신 Amazon Linux 2 AMI 이미지 아이디 가져오기
+data "aws_ssm_parameter" "eks_ami" {
+  name = "/aws/service/eks/optimized-ami/1.31/amazon-linux-2/recommended/image_id"
+}
+
+# 4-2. 시작 템플릿: Kubelet 파드 제한 강제 해제 스크립트 주입
+resource "aws_launch_template" "eks_nodes_lt" {
+  name_prefix   = "bobpick-node-lt-"
+  image_id      = data.aws_ssm_parameter.eks_ami.value
+  instance_type = "t3.micro"
+
+  # 노드가 켜질 때 이 스크립트를 실행하여 파드 4개 제한을 17개로 늘립니다.
+  user_data = base64encode(<<-EOF
+#!/bin/bash
+/etc/eks/bootstrap.sh ${aws_eks_cluster.main.name} \
+  --use-max-pods false \
+  --kubelet-extra-args '--max-pods=17'
+EOF
+  )
+}
+
+# 4-3. 워커 노드 그룹 생성 (시작 템플릿 적용)
 resource "aws_eks_node_group" "main" {
   cluster_name    = aws_eks_cluster.main.name
-  node_group_name = "bobpick-node-group-3rd"
+  
+  # 기존과 이름이 충돌하지 않고 깔끔하게 교체되도록 -v2를 붙입니다.
+  node_group_name = "bobpick-node-group-3rd-v2"
+  
   node_role_arn   = aws_iam_role.eks_node_role.arn
   subnet_ids      = [aws_subnet.private_app_a.id, aws_subnet.private_app_c.id]
 
-  # 우리가 결정한 인스턴스 타입
-  instance_types = ["t3.micro"]
+  # 기존 instance_types, ami_type 설정을 지우고 위에서 만든 시작 템플릿을 연결합니다.
+  launch_template {
+    id      = aws_launch_template.eks_nodes_lt.id
+    version = "$Latest"
+  }
+
   capacity_type  = "ON_DEMAND"
-  ami_type       = "AL2_x86_64"
-  version        = "1.31"
 
   # 노드 수 스케일링 설정
   scaling_config {
-    desired_size = 2
-    max_size     = 4
-    min_size     = 2
+    desired_size = 6
+    max_size     = 8
+    min_size     = 6
   }
 
   update_config {

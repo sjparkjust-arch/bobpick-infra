@@ -31,7 +31,7 @@ resource "aws_iam_role" "app_pod_s3_role" {
       Condition = {
         StringEquals = {
           # 나중에 쿠버네티스에서 만들 'bobpick-app-sa'라는 서비스 어카운트만 이 권한을 쓸 수 있음
-          "${replace(aws_iam_openid_connect_provider.eks.url, "https://", "")}:sub" = "system:serviceaccount:default:bobpick-app-sa"
+          "${replace(aws_iam_openid_connect_provider.eks.url, "https://", "")}:sub" = "system:serviceaccount:bobpick:bobpick-app-sa"
         }
       }
     }]
@@ -79,4 +79,39 @@ resource "aws_iam_role" "albc_role" {
 resource "aws_iam_role_policy_attachment" "albc_policy_attach" {
   policy_arn = aws_iam_policy.albc_policy.arn
   role       = aws_iam_role.albc_role.name
+}
+# Secrets Manager 읽기 권한 정책
+resource "aws_iam_policy" "eso_policy" {
+  name        = "bobpick-eso-policy-3rd"
+  policy      = jsonencode({
+    Version = "2012-10-17"
+    Statement = [{
+      Effect = "Allow"
+      Action = ["secretsmanager:GetSecretValue", "secretsmanager:DescribeSecret"]
+      Resource = ["arn:aws:secretsmanager:ap-northeast-2:370201257485:secret:*"]
+    }]
+  })
+}
+
+# ESO 로봇용 신분증
+resource "aws_iam_role" "eso_role" {
+  name = "bobpick-eso-role-3rd"
+  assume_role_policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [{
+      Effect = "Allow"
+      Principal = { Federated = aws_iam_openid_connect_provider.eks.arn }
+      Action = "sts:AssumeRoleWithWebIdentity"
+      Condition = {
+        StringEquals = {
+          "${replace(aws_iam_openid_connect_provider.eks.url, "https://", "")}:sub" = "system:serviceaccount:external-secrets:external-secrets"
+        }
+      }
+    }]
+  })
+}
+
+resource "aws_iam_role_policy_attachment" "eso_attach" {
+  policy_arn = aws_iam_policy.eso_policy.arn
+  role       = aws_iam_role.eso_role.name
 }

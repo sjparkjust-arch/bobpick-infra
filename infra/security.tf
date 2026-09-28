@@ -86,26 +86,34 @@ resource "aws_security_group" "bastion" {
   tags = { Name = "bobpick-bastion-sg" }
 }
 
-# DB(RDS/Redis) 보안그룹 (App 서버와 Bastion에서만 접근)
+# DB(RDS/Redis) 보안그룹 (VPC 내부에서만 접근 허용)
 resource "aws_security_group" "db" {
   name        = "bobpick-db-sg"
-  description = "Allow DB traffic from App servers and Bastion"
+  description = "Allow DB traffic from within the VPC"
   vpc_id      = aws_vpc.main.id
 
+  # ==========================================
+  # MySQL (3306) 허용 규칙
+  # ==========================================
   ingress {
-    description     = "MySQL from App"
-    from_port       = 3306
-    to_port         = 3306
-    protocol        = "tcp"
-    security_groups = [aws_security_group.app.id, aws_security_group.bastion.id]
+    description = "MySQL from within VPC"
+    from_port   = 3306
+    to_port     = 3306
+    protocol    = "tcp"
+    # 우리 VPC 전체 대역(10.0.0.0/16)을 허용하여 EKS 통신 에러 원천 차단
+    cidr_blocks = ["10.0.0.0/16"]
   }
 
+  # ==========================================
+  # Redis (6379) 허용 규칙
+  # ==========================================
   ingress {
-    description     = "Redis from App"
-    from_port       = 6379
-    to_port         = 6379
-    protocol        = "tcp"
-    security_groups = [aws_security_group.app.id, aws_security_group.bastion.id]
+    description = "Redis from within VPC"
+    from_port   = 6379
+    to_port     = 6379
+    protocol    = "tcp"
+    # 우리 VPC 전체 대역(10.0.0.0/16)을 허용하여 EKS 통신 에러 원천 차단
+    cidr_blocks = ["10.0.0.0/16"]
   }
 
   egress {

@@ -1,0 +1,18 @@
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: bobpick-app-monitor
+  namespace: bobpick
+  labels:
+    release: prometheus # 프로메테우스가 이 라벨을 보고 수집 대상을 찾습니다.
+spec:
+  selector:
+    matchLabels:
+      app: bobpick-app
+  endpoints:
+  - port: http # 장고 Service에 열려있는 포트 이름
+    path: /metrics
+    interval: 15s
+  namespaceSelector:
+    matchNames:
+    - bobpick
