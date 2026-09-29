@@ -42,7 +42,7 @@ resource "aws_secretsmanager_secret" "app_secret" {
 resource "aws_secretsmanager_secret_version" "app_secret_val" {
   secret_id = aws_secretsmanager_secret.app_secret.id
   secret_string = jsonencode({
-    DEBUG                   = "True"
+    DEBUG                   = "False"
     ALLOWED_HOSTS           = "*"
     DB_NAME                 = var.db_name
     DB_USER                 = var.db_username

@@ -126,9 +126,9 @@ resource "aws_eks_node_group" "main" {
 
   # 노드 수 스케일링 설정
   scaling_config {
-    desired_size = 6
-    max_size     = 8
-    min_size     = 6
+    desired_size = 8
+    max_size     = 12
+    min_size     = 8
   }
 
   update_config {

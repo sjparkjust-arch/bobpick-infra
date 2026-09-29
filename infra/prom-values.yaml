@@ -1,0 +1,15 @@
+alertmanager:
+  enabled: false
+pushgateway:
+  enabled: false
+server:
+  retention: 1d
+  persistentVolume:
+    enabled: false
+  resources:
+    requests:
+      cpu: 50m
+      memory: 128Mi
+    limits:
+      cpu: 100m
+      memory: 256Mi
