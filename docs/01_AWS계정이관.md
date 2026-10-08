@@ -5,8 +5,8 @@ Terraform으로 구축된 Django 웹서비스 전체 스택을 다른 AWS 계정
 | | |
 |---|---|
 | 작업일 | 2026년 9월 14일 (약 3시간) |
-| 출발 계정 | 304588611771 (팀원 계정) |
-| 도착 계정 | 369904859006 (본인 계정) |
+| 출발 계정 | 팀원 계정 |
+| 도착 계정 | 본인 계정 |
 | 서비스 주소 | https://bobpick.cloud |
 
 ---
@@ -92,7 +92,7 @@ AMI는 계정 소유 리소스라 그대로 넘어가지 않습니다. 두 단�
 **복사** — 새 계정에서 "나와 공유됨" 필터로 찾아 `golden-ami-v3`로 복사했습니다.
 
 ![AMI 복사](images/mig-03-ami-copy.png)
-*새 계정(369904859006)에서 공유받은 AMI를 자기 소유로 복사*
+*새 계정에서 공유받은 AMI를 자기 소유로 복사*
 
 공유 상태로만 두면 안 되는 이유가 있습니다. 소유자는 여전히 옛 계정이라, 옛 계정을 정리하는 순간 AMI가 사라지고 ASG가 인스턴스를 띄우지 못합니다. **자기 소유 사본을 만들어야 독립이 완성됩니다.**
 
@@ -193,10 +193,10 @@ sudo dpkg -i session-manager-plugin.deb
 교체한 값은 네 개입니다.
 
 ```
-DB_HOST=dev-mysql-db.ctisaa4ashqe.ap-northeast-2.rds.amazonaws.com
-REDIS_URL=redis://dev-redis-cache.l9jfsc.0001.apn2.cache.amazonaws.com:6379/0
+DB_HOST=<새 RDS 엔드포인트>
+REDIS_URL=redis://<새 Redis 엔드포인트>:6379/0
 AWS_STORAGE_BUCKET_NAME=bobpick-main-s3-move0914
-AWS_S3_CUSTOM_DOMAIN=d1gkjge9w9wt6v.cloudfront.net
+AWS_S3_CUSTOM_DOMAIN=<새 CloudFront 도메인>
 ```
 
 **AWS 액세스 키 두 줄은 삭제했습니다.** EC2에 `bobpick-app-ec2-role`이 연결되어 있어 boto3가 인스턴스 메타데이터에서 임시 자격증명을 가져오기 때문입니다.
@@ -290,10 +290,10 @@ Bastion은 태그가 `bobpick-public-bastion`이라 구조적으로 걸리지 �
 
 | 항목 | 값 |
 |---|---|
-| Bastion | 15.164.170.61 |
-| RDS (MySQL) | dev-mysql-db.ctisaa4ashqe.ap-northeast-2.rds.amazonaws.com |
-| ElastiCache (Redis) | dev-redis-cache.l9jfsc.0001.apn2.cache.amazonaws.com |
-| CloudFront | d1gkjge9w9wt6v.cloudfront.net (E2Y1P2DZS1M92M) |
+| Bastion | 퍼블릭 서브넷 (2c) 1대 |
+| RDS (MySQL) | Multi-AZ |
+| ElastiCache (Redis) | 단일 노드 |
+| CloudFront | S3 정적 파일 배포 (OAC) |
 | S3 (정적파일) | bobpick-main-s3-move0914 |
 | ASG | bobpick-app-asg-2026091404215840330000000a |
 | AMI | ami-0bac0d3c217978bad |
