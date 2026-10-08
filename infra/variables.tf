@@ -1,9 +1,10 @@
 # variables.tf
 
-# 0. SSH 허용 IP (팀원 A 담당 - Bastion 접근용)
+# 0. SSH 허용 IP (Bastion 접근용)
+#    실제 값은 저장소에 두지 않고 terraform.tfvars 또는 TF_VAR_allowed_ssh_ips 환경변수로 주입
 variable "allowed_ssh_ips" {
-  type    = list(string)
-  default = ["112.221.246.162/32"]
+  description = "Bastion SSH 접속을 허용할 관리자 IP 목록 (CIDR)"
+  type        = list(string)
 }
 
 # 1. 공통 환경 변수

@@ -9,14 +9,14 @@ resource "aws_sns_topic" "alerts" {
 resource "aws_sns_topic_subscription" "email_sub_1" {
   topic_arn = aws_sns_topic.alerts.arn
   protocol  = "email"
-  endpoint  = "hanbin69777@gmail.com" # 👈 첫 번째 이메일 주소
+  endpoint  = "<알람 받을 메일 주소>"
 }
 
 # 2번 이메일 구독 (팀원)
 resource "aws_sns_topic_subscription" "email_sub_2" {
   topic_arn = aws_sns_topic.alerts.arn
   protocol  = "email"
-  endpoint  = "sjparkjust@gmail.com" # 👈 두 번째 이메일 주소
+  endpoint  = "<알람 받을 메일 주소>"
 }
 
 # ------------------------------------------------------------------------------
