@@ -5,18 +5,12 @@ resource "aws_sns_topic" "alerts" {
   name = "bobpick-infra-alerts-topic"
 }
 
-# 1번 이메일 구독 (본인)
-resource "aws_sns_topic_subscription" "email_sub_1" {
+# 알람 메일 구독 — 받는 주소는 변수 alert_emails로 주입 (variables.tf 참고)
+resource "aws_sns_topic_subscription" "email" {
+  for_each  = toset(var.alert_emails)
   topic_arn = aws_sns_topic.alerts.arn
   protocol  = "email"
-  endpoint  = "hanbin69777@gmail.com" # 👈 첫 번째 이메일 주소
-}
-
-# 2번 이메일 구독 (팀원)
-resource "aws_sns_topic_subscription" "email_sub_2" {
-  topic_arn = aws_sns_topic.alerts.arn
-  protocol  = "email"
-  endpoint  = "sjparkjust@gmail.com" # 👈 두 번째 이메일 주소
+  endpoint  = each.value
 }
 
 # ------------------------------------------------------------------------------
