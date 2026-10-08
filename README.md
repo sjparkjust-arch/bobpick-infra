@@ -11,6 +11,8 @@
 - 프로젝트 전체 소개와 앱 코드: [menu-recommend](https://github.com/sjparkjust-arch/menu-recommend)
 - 3차 쿠버네티스 매니페스트: [bobpick-manifests](https://github.com/sjparkjust-arch/bobpick-manifests)
 
+> 9/14~15에는 2차 마무리 작업(새 AWS 계정으로 이관, 부하테스트)과 3차 착수를 함께 진행해 두 기간이 이틀 겹칩니다.
+>
 > 프로젝트 종료 후 AWS 리소스는 `terraform destroy`로 모두 삭제했습니다.
 
 <br>
